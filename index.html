@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trajet: 9 Heures d'Épuisement</title>
+    <style>
+        /* 고딕체(Sans-serif) 기반의 깔끔하고 미니멀한 타이포그래피 시스템 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #fcfcfb;
+            /* 더욱 하얗고 맑아진 내지 배경색 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #111111;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            letter-spacing: -0.01em;
+        }
+
+        /* 메인 레이아웃 구조 */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 왼쪽 패널: 스크롤바를 시각적으로 완전히 숨김 처리 */
+        .left-panel {
+            width: 35%;
+            height: 100%;
+            padding: 65px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            background: #fcfcfb;
+            position: relative;
+            z-index: 2;
+            overflow-y: auto;
+
+            /* IE and Edge 를 위한 스크롤바 숨김 */
+            -ms-overflow-style: none;
+            /* 파이어폭스를 위한 스크롤바 숨김 */
+            scrollbar-width: none;
+        }
+
+        /* 크롬, 사파리, 오페라, 웹키트 기반 브라우저를 위한 스크롤바 숨김 */
+        .left-panel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .editorial-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #111;
+            padding-bottom: 6px;
+            display: inline-block;
+            margin-bottom: 35px;
+        }
+
+        .editorial-body {
+            font-size: 13px;
+            line-height: 1.8;
+            text-align: justify;
+            color: #222;
+        }
+
+        .editorial-section {
+            margin-bottom: 28px;
+        }
+
+        .editorial-subtitle {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #000;
+        }
+
+        .quote-text {
+            margin-top: 15px;
+            font-style: italic;
+            color: #666;
+            border-left: 2px solid #111;
+            padding-left: 12px;
+            font-size: 12px;
+        }
+
+        .editorial-footer {
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #999;
+            text-transform: uppercase;
+            margin-top: 40px;
+            line-height: 1.5;
+        }
+
+        /* 오른쪽 패널: 오직 이미지 회전 트랙만 깔끔하게 배치 */
+        .right-panel {
+            width: 65%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f4;
+            /* 트랙 배경은 살짝 깊이감을 준 미니멀 그레이 */
+            position: relative;
+            z-index: 1;
+        }
+
+        .marquee-container {
+            display: flex;
+            width: 100%;
+            overflow: hidden;
+            padding: 40px 0;
+        }
+
+        .marquee-track {
+            display: flex;
+            animation: marquee 75s linear infinite;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* 고딕 컨셉에 맞춘 플립 카드 스타일 */
+        .card-container {
+            width: 250px;
+            height: 330px;
+            perspective: 1000px;
+            margin: 0 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-container:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid #111;
+        }
+
+        .card-front {
+            background-color: #e5e5e5;
+            overflow: hidden;
+        }
+
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(10%);
+            transition: filter 0.3s ease;
+        }
+
+        .card-container:hover .card-front img {
+            filter: grayscale(0%);
+        }
+
+        .card-back {
+            background-color: #111111;
+            color: #ffffff;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 25px 20px;
+            text-align: left;
+        }
+
+        .meta-label {
+            font-size: 9px;
+            color: #777777;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .meta-value {
+            font-size: 11px;
+            color: #ffffff;
+            margin-bottom: 16px;
+            word-break: keep-all;
+        }
+
+        .card-number {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 15px;
+            font-weight: 700;
+            opacity: 0.2;
+        }
+
+        /* 이미지 위층을 정밀하게 흐르는 실선 레이어 */
+        .svg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .trail-path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.4));
+        }
+
+        .map-point {
+            fill: #ff3333;
+            stroke: #000000;
+            stroke-width: 1.2;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        .map-point.active {
+            opacity: 1;
+            transform: scale(1.6);
+        }
+
+        /* 첫 화면 오버레이 - 밝고 은은하게 비치는 맑은 블러 톤 */
+        .white-blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #111;
+            cursor: pointer;
+            text-align: center;
+            padding: 40px;
+            transition: opacity 0.9s ease-out, visibility 0.9s ease-out;
+        }
+
+        .white-blur-overlay.dissolve {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .fatigue-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .click-text {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #111;
+            border: 1px solid #111;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 18px;
+            margin-top: 25px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="svg-container">
+        <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
+            <path id="route" class="trail-path"
+                d="M 1300,150 C 1250,130 1200,220 1150,260 C 1100,300 1130,420 1080,450 C 1030,480 1060,520 1020,550 C 980,580 920,500 890,560 C 860,620 900,660 840,680 C 780,700 750,550 710,580 C 670,610 650,750 580,720 C 510,690 430,730 350,780 C 270,830 150,810 100,850" />
+        </svg>
+    </div>
+
+    <div class="container">
+        <div class="left-panel">
+            <div>
+                <div class="editorial-title">Trajet : 9 Heures</div>
+
+                <div class="editorial-body">
+                    <div class="editorial-section">
+                        <span class="editorial-subtitle">[Introduction]</span>
+                        Une ligne continue, tracée à même le paysage. Pendant 9 heures, nous avons traversé les marges
+                        de la ville et les hauteurs des collines stéphanoises, collectant des fragments visuels comme on
+                        ramasserait des pierres. Ce site est le relevé poétique d'un déplacement continu où l'espace se
+                        mesure au rythme du souffle.
+                    </div>
+
+                    <div class="editorial-section">
+                        <span class="editorial-subtitle">[Le Blanc de l'Effort]</span>
+                        Il y a un moment précis où la marche bascule dans l'asphyxie douce de la fatigue. Le point de
+                        rupture où l'œil ne distingue plus les détails urbains ou ruraux, où "tout devient blanc". Ce
+                        blanc n'est pas une absence, c'est la saturation de l'espace dans le corps. Les photographies
+                        présentées ici témoignent de ces instants de lucidité suspendue, des indices tangibles d'une
+                        présence humaine qui s'est dissoute dans l'immensité du trajet.
+                        <div class="quote-text">"Quand l'esprit s'efface sous le poids des pas, seule la trace persists,
+                            fragile et obstinée."</div>
+                    </div>
+
+                    <div class="editorial-section">
+                        <span class="editorial-subtitle">[L'Espace Cartographié]</span>
+                        L'archive redessine la topographie de l'effort. En faisant interagir l'image et le vecteur, le
+                        projet interroge : comment restituer la mémoire d'un lieu qui a été traversé dans un état de
+                        quasi-disparition de soi ? Le point rouge qui s'allume est le témoin factuel d'un enregistrement
+                        précis, une balise mémorielle posée sur le fil blanc de notre trajectoire accumulée.
+                    </div>
+                </div>
+            </div>
+
+            <div class="editorial-footer">
+                Saint-Étienne — France<br>
+                ESADSE 1ère année<br>
+                Jiwon BAEK
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="marquee-container">
+                <div class="marquee-track" id="track">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fatigue-overlay" class="white-blur-overlay">
+        <div class="fatigue-text">"Tout devient blanc, l'esprit s'efface..."</div>
+        <div class="fatigue-text"
+            style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #555;">Il
+            n'y a plus que la trace.</div>
+        <div class="click-text">Entrer dans l'archive</div>
+    </div>
+
+    <script>
+        const journeyData = [
+            { id: 1, time: "08:51 AM", lat: "45.4410° N", lng: "4.3860° E", addr: "Dép. St-Étienne, Chemin du Musée de la Mine", img: "IMG_8085.jpg" },
+            { id: 2, time: "09:07 AM", lat: "45.4378° N", lng: "4.3807° E", addr: "Montée vers Crématorium de Montmartre", img: "IMG_8089.jpg" },
+            { id: 3, time: "09:11 AM", lat: "45.4347° N", lng: "4.3754° E", addr: "Hauts de la Ville, Vue Panoramique Bellevue", img: "IMG_8090.jpg" },
+            { id: 4, time: "09:39 AM", lat: "45.4315° N", lng: "4.3701° E", addr: "Sentier Forestier du Val Jomayère", img: "IMG_8091.jpg" },
+            { id: 5, time: "09:44 AM", lat: "45.4284° N", lng: "4.3648° E", addr: "Crête de Grange Neuve, Pâturage", img: "IMG_8092.jpg" },
+            { id: 6, time: "11:14 AM", lat: "45.4252° N", lng: "4.3595° E", addr: "Entrée Zone Urbaine Bellevue - 'SAINT-ÉTIENNE'", img: "IMG_8094.jpg" },
+            { id: 7, time: "11:16 AM", lat: "45.4221° N", lng: "4.3542° E", addr: "Fin de la Zone Pastorale / Périurbaine", img: "IMG_8095.jpg" },
+            { id: 8, time: "11:16 PM", lat: "45.4189° N", lng: "4.3489° E", addr: "Dépassement Zone Bellevue (direction Ouest)", img: "IMG_8096.jpg" },
+            { id: 9, time: "11:22 PM", lat: "45.4158° N", lng: "4.3436° E", addr: "Passage Périphérique Ouest (Traversée)", img: "IMG_8099.jpg" },
+            { id: 10, time: "11:42 PM", lat: "45.4126° N", lng: "4.3383° E", addr: "Ambiance Urbaine, Graffitis (Rue de l'Isle)", img: "IMG_8100.jpg" },
+            { id: 11, time: "11:44 PM", lat: "45.4095° N", lng: "4.3330° E", addr: "Chemin du Bessy (Côteau Sud)", img: "IMG_8101.jpg" },
+            { id: 12, time: "12:04 PM", lat: "45.4063° N", lng: "4.3277° E", addr: "Le Chambon-Feugerolles, Avenue Ferrer", img: "IMG_8102.jpg" },
+            { id: 13, time: "12:07 PM", lat: "45.4032° N", lng: "4.3224° E", addr: "Coteau du Chambon, Zone Pastorale", img: "IMG_8103.jpg" },
+            { id: 14, time: "12:53 PM", lat: "45.4000° N", lng: "4.3171° E", addr: "Sentier de Crête, Gagner le Refuge", img: "IMG_8106.jpg" },
+            { id: 15, time: "13:53 PM", lat: "45.3969° N", lng: "4.3118° E", addr: "Zone Ombragée, Bois du Lizeron", img: "IMG_8115.jpg" },
+            { id: 16, time: "14:07 PM", lat: "45.3937° N", lng: "4.3065° E", addr: "Vue sur Côteau de Firminy", img: "IMG_8116.jpg" },
+            { id: 17, time: "14:10 PM", lat: "45.3906° N", lng: "4.3012° E", addr: "Cimetière du Chambon (vue d'ensemble)", img: "IMG_8117.jpg" },
+            { id: 18, time: "15:29 PM", lat: "45.3874° N", lng: "4.2959° E", addr: "Sentier d'Altitude du Guizay", img: "IMG_8118.jpg" },
+            { id: 19, time: "16:47 PM", lat: "45.3843° N", lng: "4.2906° E", addr: "Rue de Bellevue (Firminy)", img: "IMG_8119.jpg" },
+            { id: 20, time: "18:00 PM", lat: "45.3810° N", lng: "4.2850° E", addr: "Arrêt Trajet, Site Le Corbusier (Firminy)", img: "IMG_8160.jpg" }
+        ];
+
+        const track = document.getElementById('track');
+        const svg = document.querySelector('svg');
+
+        function createCard(item) {
+            return `
+                <div class="card-container" data-point-id="point-${item.id}">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <img src="${item.img}" alt="Trajet Scene">
+                            <div class="card-number">${String(item.id).padStart(2, '0')}</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="meta-label">TIME</div>
+                            <div class="meta-value">${item.time}</div>
+                            <div class="meta-label">COORDINATES</div>
+                            <div class="meta-value">${item.lat}<br>${item.lng}</div>
+                            <div class="meta-label">LOCATION</div>
+                            <div class="meta-value">${item.addr}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const totalCardsHtml = [...journeyData, ...journeyData].map(item => createCard(item)).join('');
+        track.innerHTML = totalCardsHtml;
+
+        const path = document.getElementById('route');
+        const pathLength = path.getTotalLength();
+        const numPoints = journeyData.length;
+
+        function getBiasedProgress(i, total) {
+            const normalProgress = i / (total - 1);
+            if (normalProgress < 0.3) {
+                return normalProgress * 0.85;
+            } else if (normalProgress < 0.75) {
+                return normalProgress * 1.02;
+            } else {
+                return normalProgress;
+            }
+        }
+
+        for (let i = 0; i < numPoints; i++) {
+            const biasedProgress = getBiasedProgress(i, numPoints);
+            const pointAtInterval = path.getPointAtLength(biasedProgress * pathLength);
+
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("id", `point-${i + 1}`);
+            circle.setAttribute("class", "map-point");
+            circle.setAttribute("cx", pointAtInterval.x);
+            circle.setAttribute("cy", pointAtInterval.y);
+            circle.setAttribute("r", "4.8");
+            svg.appendChild(circle);
+        }
+
+        const cards = document.querySelectorAll('.card-container');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const pointId = card.getAttribute('data-point-id');
+                const targetPoint = document.getElementById(pointId);
+                if (targetPoint) targetPoint.classList.add('active');
+            });
+
+            card.addEventListener('mouseleave', () => {
+                const pointId = card.getAttribute('data-point-id');
+                const targetPoint = document.getElementById(pointId);
+                if (targetPoint) targetPoint.classList.remove('active');
+            });
+        });
+
+        const overlay = document.getElementById('fatigue-overlay');
+        overlay.addEventListener('click', () => {
+            overlay.classList.add('dissolve');
+        });
+    </script>
+</body>
+
+</html>
